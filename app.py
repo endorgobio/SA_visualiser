@@ -126,7 +126,8 @@ def update_figure(selec_prod):
     fig = px.line(df, x='fechaCaptura', y=ciudades,
                   title="Precio de {} en las distintas plazas de mercado".format(selec_prod),
                   labels={'value': 'precio (kg)',
-                          'fechaCaptura': 'Fecha registro'}
+                          'fechaCaptura': 'Fecha registro',
+                          'variable': 'ciudad'}
                   )
     fig.update_layout(transition_duration=500)
 
