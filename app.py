@@ -9,6 +9,21 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 
+# read data from dane
+# TODO: Timeout issue in heroku
+# wsdl = 'http://appweb.dane.gov.co:9001/sipsaWS/SrvSipsaUpraBeanService?WSDL'
+# client = zeep.Client(wsdl=wsdl)
+# promAbas = client.service.promediosSipsaCiudad()
+# promAbas = serialize_object(promAbas)
+# df_precioProm = pd.DataFrame(promAbas)
+# df_precioProm['fechaCaptura'] = pd.to_datetime(df_precioProm['fechaCaptura'], utc=True).dt.date
+# df_precioProm['fechaCreacion'] = pd.to_datetime(df_precioProm['fechaCreacion'], utc=True).dt.date
+# #df_precioProm.to_excel("output.xlsx")
+# #df_precioProm.to_csv("output.csv")
+
+# read from github (already processed)
+#df_precioProm = pd.read_excel('https://github.com/endorgobio/SA_visualiser/blob/master/output.xlsx', index_col=0)
+df_precioProm = pd.read_csv('https://raw.githubusercontent.com/endorgobio/SA_visualiser/master/output.csv', index_col=0)
 
 external_stylesheets = [dbc.themes.BOOTSTRAP,
     #'https://codepen.io/chriddyp/pen/bWLwgP.css',
@@ -19,18 +34,7 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets,
                 title="Seguridad alimentaria")
 server = app.server
 
-wsdl = 'http://appweb.dane.gov.co:9001/sipsaWS/SrvSipsaUpraBeanService?WSDL'
-client = zeep.Client(wsdl=wsdl)
-promAbas = client.service.promediosSipsaCiudad()
-
-promAbas = serialize_object(promAbas)
-df_precioProm = pd.DataFrame(promAbas)
-df_precioProm['fechaCaptura'] = pd.to_datetime(df_precioProm['fechaCaptura'], utc=True).dt.date
-df_precioProm['fechaCreacion'] = pd.to_datetime(df_precioProm['fechaCreacion'], utc=True).dt.date
-df_precioProm.to_excel("output.xlsx")
-
-
-#df_precioProm = pd.read_excel('output.xlsx', index_col=0)
+# get data from the df for the layout
 ciudades = df_precioProm['ciudad'].unique()
 productos = df_precioProm['producto'].unique()
 productos_dict =[{"label": k, "value": k} for k in productos]
