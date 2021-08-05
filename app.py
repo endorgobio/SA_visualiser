@@ -23,7 +23,7 @@ import dash_core_components as dcc
 
 # read from github (already processed)
 #df_precioProm = pd.read_excel('https://github.com/endorgobio/SA_visualiser/blob/master/output.xlsx', index_col=0)
-df_precioProm = pd.read_csv('https://raw.githubusercontent.com/endorgobio/SA_visualiser/master/output.csv', index_col=0)
+df_precioProm = pd.read_csv('https://raw.githubusercontent.com/endorgobio/SA_visualiser/master/data/output.csv', index_col=0)
 
 external_stylesheets = [dbc.themes.BOOTSTRAP,
     #'https://codepen.io/chriddyp/pen/bWLwgP.css',
