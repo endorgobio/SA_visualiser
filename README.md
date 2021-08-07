@@ -1,2 +1,4 @@
 # SA_visualiser
-This is a interactive tool that allows to visualise the price of the agricultural products in the different  marketplaces in colombia. The information is taking from the [SIPSA](https://www.dane.gov.co/index.php/servicios-al-ciudadano/servicios-informacion/sipsa)  
+This is a interactive tool that allows to visualise the price of the agricultural products in the different  marketplaces in colombia. The information is taking from the [SIPSA](https://www.dane.gov.co/index.php/servicios-al-ciudadano/servicios-informacion/sipsa)  which is the plataform managed by Colombian Department for Statistics [DANE](https://www.dane.gov.co/) (Departamento Administrativo Nacional de Estadística DANE)
+
+The data is update daily using a [workflow](https://docs.github.com/es/actions/learn-github-actions) in github. The file in [update_data.yml](https://raw.githubusercontent.com/endorgobio/SA_visualiser/31c89961f1f4aff444fe2af3a51de96fd954951c/.github/workflows/update_data.yml) provides the details. The user interface/dashboard is developed in Dash. A running version of it is avaibale at [https://savisualiser.herokuapp.com/](https://savisualiser.herokuapp.com/)
