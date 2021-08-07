@@ -25,20 +25,24 @@ import dash_core_components as dcc
 #df_precioProm = pd.read_excel('https://github.com/endorgobio/SA_visualiser/blob/master/output.xlsx', index_col=0)
 df_precioProm = pd.read_csv('https://raw.githubusercontent.com/endorgobio/SA_visualiser/master/data/output.csv', index_col=0)
 
+# Define the stylesheets
 external_stylesheets = [dbc.themes.BOOTSTRAP,
     #'https://codepen.io/chriddyp/pen/bWLwgP.css',
     'https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap'
 ]
 
+# Creates the app
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets,
                 title="Seguridad alimentaria")
+# need to run it in heroku
 server = app.server
 
-# get data from the df for the layout
+# get data from the dataframe to be used in the layout
 ciudades = df_precioProm['ciudad'].unique()
 productos = df_precioProm['producto'].unique()
 productos_dict =[{"label": k, "value": k} for k in productos]
 
+# text to add in the layout
 markdown_text = '''
 Esta es una herramienta interactiva que visualizar los precios de los productos agrícolas en las distintas plazas de 
 mercado del país. Para ello:
@@ -48,6 +52,7 @@ mercado del país. Para ello:
 Note que en aquellos casos en los que no se encuentra valor registrado en el SIPSA, el gráfico se presentará discontinuo
 '''
 
+# Control to choose the product to visualise
 controls = html.Div(
     [
         dbc.Card(
@@ -75,8 +80,7 @@ controls = html.Div(
     ]
 )
 
-
-
+# Define the layout
 app.layout = dbc.Container([
         html.Div(
             children=[
@@ -110,19 +114,27 @@ app.layout = dbc.Container([
     fluid=True,
 )
 
+# Callback to update the graph
 @app.callback(
     Output('chart', 'figure'),
     Input(component_id='prod-dropdown', component_property='value')
     )
 def update_figure(selec_prod):
+    # create empty dataframe to aggregate the dat for the different cities
     df = pd.DataFrame(columns=['fechaCaptura'])
+    # filter dataframe for the chosen product
     df_filtered = df_precioProm[df_precioProm['producto'] == selec_prod]
     for ciudad in ciudades:
+        # gets the data for the chosen product in ecah city
         dfT = df_filtered[(df_precioProm['ciudad'] == ciudad)][['fechaCaptura', 'precioPromedio']]
+        # rename the column precioPromedio according to the particular city
         dfT = dfT.rename(columns={'precioPromedio': ciudad})
+        # merge the dataframe for the different cities
         df = pd.merge(df, dfT, how="outer", on=["fechaCaptura", "fechaCaptura"])
 
+    # Sort the values based on recording data
     df.sort_values(by=['fechaCaptura'], inplace=True)
+    # create the figure
     fig = px.line(df, x='fechaCaptura', y=ciudades,
                   title="Precio de {} en las distintas plazas de mercado".format(selec_prod),
                   labels={'value': 'precio (kg)',
@@ -134,6 +146,6 @@ def update_figure(selec_prod):
     return fig
 
 
-
+# main to run the app
 if __name__ == "__main__":
     app.run_server(debug=True)
