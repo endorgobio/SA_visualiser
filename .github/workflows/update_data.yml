@@ -2,7 +2,7 @@ name: update_data
 
 on:
   schedule:
-    - cron: '5 16 * * *' # runs at 21:00 UTC everyday
+    - cron: '17 16 * * *' # runs at 21:00 UTC everyday
 
 jobs:
   build:
@@ -36,4 +36,4 @@ jobs:
         uses: ad-m/github-push-action@v0.6.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
+          branch: master
