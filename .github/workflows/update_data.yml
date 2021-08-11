@@ -2,7 +2,7 @@ name: update_data
 
 on:
   schedule:
-    - cron: '25 16 * * *' # runs at 21:00 UTC everyday
+    - cron: '35 16 * * *' # runs at 21:00 UTC everyday
 
 jobs:
   build:
