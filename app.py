@@ -1,7 +1,5 @@
 import pandas as pd
 import plotly.express as px
-import zeep
-from zeep.helpers import serialize_object
 import dash
 import dash_core_components as dcc
 from dash.dependencies import Input, Output
@@ -9,17 +7,6 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 
-# read data from dane
-# TODO: Timeout issue in heroku
-# wsdl = 'http://appweb.dane.gov.co:9001/sipsaWS/SrvSipsaUpraBeanService?WSDL'
-# client = zeep.Client(wsdl=wsdl)
-# promAbas = client.service.promediosSipsaCiudad()
-# promAbas = serialize_object(promAbas)
-# df_precioProm = pd.DataFrame(promAbas)
-# df_precioProm['fechaCaptura'] = pd.to_datetime(df_precioProm['fechaCaptura'], utc=True).dt.date
-# df_precioProm['fechaCreacion'] = pd.to_datetime(df_precioProm['fechaCreacion'], utc=True).dt.date
-# #df_precioProm.to_excel("output.xlsx")
-# #df_precioProm.to_csv("output.csv")
 
 # read from github (already processed)
 #df_precioProm = pd.read_excel('https://github.com/endorgobio/SA_visualiser/blob/master/output.xlsx', index_col=0)
@@ -28,12 +15,14 @@ df_precioProm = pd.read_csv('https://raw.githubusercontent.com/endorgobio/SA_vis
 # Define the stylesheets
 external_stylesheets = [dbc.themes.BOOTSTRAP,
     #'https://codepen.io/chriddyp/pen/bWLwgP.css',
-    'https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap'
+    'https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap',
+    #'https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet'
 ]
 
 # Creates the app
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets,
-                title="Seguridad alimentaria")
+                title="Seguridad alimentaria",
+                suppress_callback_exceptions=True)
 # need to run it in heroku
 server = app.server
 
@@ -80,6 +69,21 @@ controls = html.Div(
     ]
 )
 
+fila = dbc.Row(
+    [
+        dbc.Col(controls, md=3),
+        dbc.Col(
+            html.Div([
+                dcc.Graph(
+                    id="chart",
+                )
+            ]),
+            md=9
+        ),
+    ],
+    align="center",
+),
+
 # Define the layout
 app.layout = dbc.Container([
         html.Div(
@@ -95,24 +99,37 @@ app.layout = dbc.Container([
             ],
             className="header",
         ),
-        html.Hr(),
-        dbc.Row(
+
+        dbc.Tabs(
             [
-                dbc.Col(controls, md=3),
-                dbc.Col(
-                    html.Div([
-                        dcc.Graph(
-                                id="chart",
-                                )
-                    ]),
-                    md=9
-                ),
+                dbc.Tab(label="La historia", tab_id="historia"),
+                dbc.Tab(label="La solución", tab_id="solucion"),
+                dbc.Tab(label="Los detalles", tab_id="detalles"),
             ],
-            align="center",
+            id="tabs",
+            active_tab="historia",
         ),
+        dbc.Row(id="tab-content", className="p-4"),
     ],
     fluid=True,
 )
+
+@app.callback(
+    Output("tab-content", "children"),
+    Input("tabs", "active_tab"),
+)
+def render_tab_content(active_tab):
+    """
+    This callback takes the 'active_tab' property as input, as well as the
+    stored graphs, and renders the tab content depending on what the value of
+    'active_tab' is.
+    """
+    if active_tab == "historia":
+        return markdown_text
+    elif active_tab == "solucion":
+        return fila
+    elif active_tab == "detalles":
+        return markdown_text
 
 # Callback to update the graph
 @app.callback(
