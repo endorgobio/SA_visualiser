@@ -47,7 +47,7 @@ Note que en aquellos casos en los que no se encuentra valor registrado en el SIP
 '''
 
 # Control to choose the product to visualise
-controls = html.Div(
+controls_line = html.Div(
     [
         dbc.Card(
             dbc.CardBody(
@@ -74,9 +74,54 @@ controls = html.Div(
     ]
 )
 
+controls_map = html.Div(
+    [
+        dbc.Card(
+            dbc.CardBody(
+                [
+                    dbc.FormGroup(
+                        [
+                            dcc.Dropdown(
+                                id='prod-dropdown-map',
+                                options=productos_dict,
+                                value=productos[0]
+                            ),
+                        ]
+                    )
+                ]
+            ),
+        ),
+        dbc.Card(
+            dbc.CardBody(
+                [
+                    dbc.FormGroup(
+                        [
+                            dcc.DatePickerSingle(
+                                id='date-picker',
+                                min_date_allowed=df_promRec['enmaFecha'].min(),
+                                max_date_allowed=df_promRec['enmaFecha'].max(),
+                                initial_visible_month=df_promRec['enmaFecha'].min(),
+                                date=df_promRec['enmaFecha'].max(),
+                                display_format='DD/MM/YYYY',
+                            ),
+                        ]
+                    )
+                ]
+            ),
+        ),
+        dbc.Card(
+            dbc.CardBody(
+                [
+                    dcc.Markdown(children=markdown_text)
+                ]
+            ),
+        ),
+    ]
+)
+
 fila = dbc.Row(
     [
-        dbc.Col(controls, md=3),
+        dbc.Col(controls_line, md=3),
         dbc.Col(
             html.Div([
                 dcc.Graph(
@@ -91,11 +136,12 @@ fila = dbc.Row(
 
 fila2 = dbc.Row(
     [
-        dbc.Col(controls, md=3),
+        dbc.Col(controls_map, md=3),
         dbc.Col(
             html.Div([
                 dcc.Graph(
                     id="chart_bubble",
+                    style={"height": 700}
                 )
             ]),
             md=9
@@ -186,11 +232,13 @@ def update_figure(selec_prod):
 
 @app.callback(
     Output('chart_bubble', 'figure'),
-    Input(component_id='prod-dropdown', component_property='value')
+    [Input(component_id='prod-dropdown-map', component_property='value'),
+     Input(component_id='date-picker', component_property='date')]
     )
-def update_figure_promRec(selec_prod):#, select_date):
+
+def update_figure_promRec(selec_prod, select_date):
     # filter dataframe for the chosen product and date
-    df_filtered = df_promRec[(df_promRec['enmaFecha'] == '2020-02-01') & (df_promRec['artiNombre'] == selec_prod)][[
+    df_filtered = df_promRec[(df_promRec['enmaFecha'] == select_date) & (df_promRec['artiNombre'] == selec_prod)][[
         'fuenNombre', 'promedioKg', 'LATITUD', 'LONGITUD']]
     maxRec = df_filtered['promedioKg'].max() / 50
     df_filtered['size'] = df_filtered['promedioKg'] / maxRec
