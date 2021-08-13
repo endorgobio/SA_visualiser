@@ -6,11 +6,16 @@ from dash.dependencies import Input, Output
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
+from plotly import graph_objs as go
+
 
 
 # read from github (already processed)
 #df_precioProm = pd.read_excel('https://github.com/endorgobio/SA_visualiser/blob/master/output.xlsx', index_col=0)
 df_precioProm = pd.read_csv('https://raw.githubusercontent.com/endorgobio/SA_visualiser/master/data/output.csv', index_col=0)
+df_promRec = pd.read_csv('data/promRec.csv')
+df_promRec = df_promRec.sort_values(by=["promedioKg"], ascending=False)
+df_promRec.reset_index(drop=True, inplace=True)
 
 # Define the stylesheets
 external_stylesheets = [dbc.themes.BOOTSTRAP,
@@ -84,6 +89,23 @@ fila = dbc.Row(
     align="center",
 ),
 
+fila2 = dbc.Row(
+    [
+        dbc.Col(controls, md=3),
+        dbc.Col(
+            html.Div([
+                dcc.Graph(
+                    id="chart_bubble",
+                )
+            ]),
+            md=9
+        ),
+    ],
+    align="center",
+),
+
+
+
 # Define the layout
 app.layout = dbc.Container([
         html.Div(
@@ -129,7 +151,7 @@ def render_tab_content(active_tab):
     elif active_tab == "solucion":
         return fila
     elif active_tab == "detalles":
-        return markdown_text
+        return fila2
 
 # Callback to update the graph
 @app.callback(
@@ -159,6 +181,43 @@ def update_figure(selec_prod):
                           'variable': 'ciudad'}
                   )
     fig.update_layout(transition_duration=500)
+
+    return fig
+
+@app.callback(
+    Output('chart_bubble', 'figure'),
+    Input(component_id='prod-dropdown', component_property='value')
+    )
+def update_figure_promRec(selec_prod):#, select_date):
+    # filter dataframe for the chosen product and date
+    df_filtered = df_promRec[(df_promRec['enmaFecha'] == '2020-02-01') & (df_promRec['artiNombre'] == selec_prod)][[
+        'fuenNombre', 'promedioKg', 'LATITUD', 'LONGITUD']]
+    maxRec = df_filtered['promedioKg'].max() / 50
+    df_filtered['size'] = df_filtered['promedioKg'] / maxRec
+    # Create the figure and feed it all the prepared columns
+    fig = go.Figure(
+        go.Scattermapbox(
+            lat=df_filtered['LATITUD'],
+            lon=df_filtered['LONGITUD'],
+            mode='markers',
+            marker=go.scattermapbox.Marker(
+                size=df_filtered['size'],
+                color=df_filtered['size'],
+                colorscale='Emrld'
+            )
+        )
+    )
+
+    # Specify layout information
+    fig.update_layout(
+        mapbox=dict(
+            accesstoken='pk.eyJ1IjoiZW5kb3Jnb2JpbyIsImEiOiJja3M5bGs2MXUwNTlvMm9xOGQycjk1cTBiIn0.ziyGoWezFGUB_dnp4QHL6g',
+            #
+            center=go.layout.mapbox.Center(lat=6.229523320626823, lon=-75.58190090468244),
+            zoom=5
+        ),
+        transition_duration=500
+    )
 
     return fig
 

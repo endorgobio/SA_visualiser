@@ -34,9 +34,7 @@ client = zeep.Client(wsdl=wsdl)
 # df_promRec.to_csv("data/promRec.csv")
 
 
-df_promRec = pd.read_csv('data/promRec.csv')
-df_promRec = df_promRec.sort_values(by=["promedioKg"], ascending=False)
-df_promRec.reset_index(drop=True, inplace=True)
+
 
 #dates = df_promRec['enmaFecha'].unique()
 #print(dates)
@@ -81,8 +79,7 @@ import configparser
 #config = configparser.read('config.ini')
 #mapbox_token = config['mapbox']['secret_token']
 
-df_filtered = df_promRec[(df_promRec['enmaFecha'] == '2020-02-01') & (df_promRec['artiNombre'] == 'Habichuela')][[
-    'fuenNombre', 'promedioKg', 'LATITUD', 'LONGITUD']]
+
 #df_filtered['LATITUD'].apply(lambda x: str(x.replace(',','.')))
 #df_filtered['LATITUD'] = df_filtered['LATITUD'].astype(float, errors = 'raise')
 
@@ -115,39 +112,5 @@ df_filtered = df_promRec[(df_promRec['enmaFecha'] == '2020-02-01') & (df_promRec
 
 
 
-def update_figure_promRec(selec_prod, select_date):
-    # filter dataframe for the chosen product and date
-    df_filtered = df_promRec[(df_promRec['enmaFecha'] == select_date) & (df_promRec['artiNombre'] == selec_prod)][[
-        'fuenNombre', 'promedioKg', 'LATITUD', 'LONGITUD']]
-    maxRec = df_filtered['promedioKg'].max()/50
-    df_filtered['size'] = df_filtered['promedioKg']/maxRec
-    # Create the figure and feed it all the prepared columns
-    fig = go.Figure(
-        go.Scattermapbox(
-            lat=df_filtered['LATITUD'],
-            lon=df_filtered['LONGITUD'],
-            mode='markers',
-            marker=go.scattermapbox.Marker(
-                size=df_filtered['size'],
-                color=df_filtered['size'],
-                colorscale= 'Emrld'
-            )
-        )
-    )
-
-    # Specify layout information
-    fig.update_layout(
-        mapbox=dict(
-            accesstoken='pk.eyJ1IjoiZW5kb3Jnb2JpbyIsImEiOiJja3M5bGs2MXUwNTlvMm9xOGQycjk1cTBiIn0.ziyGoWezFGUB_dnp4QHL6g', #
-            center=go.layout.mapbox.Center(lat=6.229523320626823, lon=-75.58190090468244),
-            zoom=5
-        ),
-        transition_duration=500
-    )
 
 
-    return fig
-
-fig = update_figure_promRec('Habichuela', '2020-02-01')
-# Display the figure
-fig.show()
