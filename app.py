@@ -7,14 +7,14 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 from plotly import graph_objs as go
+import numpy as np
 
 
 
 # read from github (already processed)
-#df_precioProm = pd.read_excel('https://github.com/endorgobio/SA_visualiser/blob/master/output.xlsx', index_col=0)
 df_precioProm = pd.read_csv('https://raw.githubusercontent.com/endorgobio/SA_visualiser/master/data/output.csv', index_col=0)
+# TODO: Read from github
 df_promRec = pd.read_csv('data/promRec.csv')
-df_promRec = df_promRec.sort_values(by=["promedioKg"], ascending=False)
 df_promRec.reset_index(drop=True, inplace=True)
 
 # Define the stylesheets
@@ -36,22 +36,27 @@ ciudades = df_precioProm['ciudad'].unique()
 productos = df_precioProm['producto'].unique()
 productos_dict =[{"label": k, "value": k} for k in productos]
 
-# text to add in the layout
-markdown_text = '''
-Esta es una herramienta interactiva que visualizar los precios de los productos agrícolas en las distintas plazas de 
-mercado del país. Para ello:
-* Seleccione en el menú desplegable el producto de interes
-* En el gráfico active o desactive las ciudades que desea comparar
 
-Note que en aquellos casos en los que no se encuentra valor registrado en el SIPSA, el gráfico se presentará discontinuo
-'''
+# initial text
+tab1_text = dcc.Markdown('''
+In a hole in the ground there lived a hobbit. Not a nasty, dirty, wet hole, filled with the ends
+of worms and an oozy smell, nor yet a dry, bare, sandy hole with nothing in it to sit down on or to
+eat: it was a [hobbit-hole][1], and that means comfort.
 
-# Control to choose the product to visualise
+[1]: <https://en.wikipedia.org/wiki/Hobbit#Lifestyle> "Hobbit lifestyles"
+''')
+
+
+controlsline_text = '''
+    * Seleccione en el menú desplegable el producto de interes
+    * En el gráfico active o desactive las ciudades que desea comparar
+    '''
 controls_line = html.Div(
     [
         dbc.Card(
             dbc.CardBody(
                 [
+                    dcc.Markdown(children=controlsline_text),
                     dbc.FormGroup(
                         [
                             dcc.Dropdown(
@@ -64,21 +69,19 @@ controls_line = html.Div(
                 ]
             ),
         ),
-        dbc.Card(
-            dbc.CardBody(
-                [
-                    dcc.Markdown(children=markdown_text)
-                ]
-            ),
-        ),
     ]
 )
 
+controlsmap_text = '''
+    * Seleccione en el menú desplegable el producto de interes
+    * Seleccione la fecha que desea visualizar
+    '''
 controls_map = html.Div(
     [
         dbc.Card(
             dbc.CardBody(
                 [
+                    dcc.Markdown(children=controlsmap_text),
                     dbc.FormGroup(
                         [
                             dcc.Dropdown(
@@ -87,13 +90,7 @@ controls_map = html.Div(
                                 value=productos[0]
                             ),
                         ]
-                    )
-                ]
-            ),
-        ),
-        dbc.Card(
-            dbc.CardBody(
-                [
+                    ),
                     dbc.FormGroup(
                         [
                             dcc.DatePickerSingle(
@@ -109,47 +106,52 @@ controls_map = html.Div(
                 ]
             ),
         ),
-        dbc.Card(
-            dbc.CardBody(
-                [
-                    dcc.Markdown(children=markdown_text)
-                ]
-            ),
-        ),
     ]
 )
 
-fila = dbc.Row(
-    [
-        dbc.Col(controls_line, md=3),
-        dbc.Col(
-            html.Div([
-                dcc.Graph(
-                    id="chart",
-                )
-            ]),
-            md=9
-        ),
-    ],
-    align="center",
-),
+tab1_content = dbc.Row([
+        tab1_text
+    ]
+)
 
-fila2 = dbc.Row(
+tab2_content = html.Div(
     [
-        dbc.Col(controls_map, md=3),
-        dbc.Col(
-            html.Div([
-                dcc.Graph(
-                    id="chart_bubble",
-                    style={"height": 700}
-                )
-            ]),
-            md=9
+        # Line graph and controls
+        dbc.Row(
+            className="row-with-margin",
+            children=[
+                dbc.Col(controls_line, md=3),
+                dbc.Col(
+                    html.Div([
+                        dcc.Graph(
+                            id="chart",
+                        )
+                    ]),
+                    md=9
+                ),
+            ],
+            align="center",
         ),
-    ],
-    align="center",
-),
 
+        dbc.Row(html.Div("                                 ")),
+        # map graph and controls
+        dbc.Row(
+            [
+                dbc.Col(controls_map, md=3),
+                dbc.Col(
+                    html.Div([
+                        dcc.Graph(
+                            id="chart_bubble",
+                            #style={"height": 700}
+                        )
+                    ]),
+                    md=9
+                ),
+            ],
+            align="center",
+        )
+    ]
+)
 
 
 # Define the layout
@@ -193,11 +195,11 @@ def render_tab_content(active_tab):
     'active_tab' is.
     """
     if active_tab == "historia":
-        return markdown_text
+        return tab1_content
     elif active_tab == "solucion":
-        return fila
+        return tab2_content
     elif active_tab == "detalles":
-        return fila2
+        return tab1_content
 
 # Callback to update the graph
 @app.callback(
@@ -221,7 +223,7 @@ def update_figure(selec_prod):
     df.sort_values(by=['fechaCaptura'], inplace=True)
     # create the figure
     fig = px.line(df, x='fechaCaptura', y=ciudades,
-                  title="Precio de {} en las distintas plazas de mercado".format(selec_prod),
+                  title="Precio por kg de {} en las distintas plazas de mercado".format(selec_prod),
                   labels={'value': 'precio (kg)',
                           'fechaCaptura': 'Fecha registro',
                           'variable': 'ciudad'}
@@ -229,6 +231,8 @@ def update_figure(selec_prod):
     fig.update_layout(transition_duration=500)
 
     return fig
+
+
 
 @app.callback(
     Output('chart_bubble', 'figure'),
@@ -242,6 +246,9 @@ def update_figure_promRec(selec_prod, select_date):
         'fuenNombre', 'promedioKg', 'LATITUD', 'LONGITUD']]
     maxRec = df_filtered['promedioKg'].max() / 50
     df_filtered['size'] = df_filtered['promedioKg'] / maxRec
+
+
+
     # Create the figure and feed it all the prepared columns
     fig = go.Figure(
         go.Scattermapbox(
@@ -251,18 +258,29 @@ def update_figure_promRec(selec_prod, select_date):
             marker=go.scattermapbox.Marker(
                 size=df_filtered['size'],
                 color=df_filtered['size'],
-                colorscale='Emrld'
-            )
+                colorscale='Emrld',
+                #showscale=True,
+                #colorbar={'title': 'Kg recogidos', 'titleside': 'top', 'thickness': 4},
+            ),
+            customdata = np.stack(
+                (pd.Series(df_filtered.index),
+                 df_filtered['fuenNombre'],
+                 df_filtered['promedioKg']),
+                axis=-1
+            ),
+            hovertemplate = "<extra></extra>"
+                            "<em>%{customdata[1]}</em><br>"
+                            "Cantidad(kg): %{customdata[2]}",
         )
     )
-
     # Specify layout information
     fig.update_layout(
+        title = "Cantidad (kg) recogida en las distintas plazas de mercado de {}".format(selec_prod),
         mapbox=dict(
             accesstoken='pk.eyJ1IjoiZW5kb3Jnb2JpbyIsImEiOiJja3M5bGs2MXUwNTlvMm9xOGQycjk1cTBiIn0.ziyGoWezFGUB_dnp4QHL6g',
             #
             center=go.layout.mapbox.Center(lat=6.229523320626823, lon=-75.58190090468244),
-            zoom=5
+            zoom=4
         ),
         transition_duration=500
     )
