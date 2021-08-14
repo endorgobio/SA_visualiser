@@ -184,6 +184,7 @@ app.layout = dbc.Container([
     fluid=True,
 )
 
+
 @app.callback(
     Output("tab-content", "children"),
     Input("tabs", "active_tab"),
