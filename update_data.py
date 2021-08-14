@@ -1,7 +1,6 @@
 import pandas as pd
 import zeep
 from zeep.helpers import serialize_object
-import plotly.express as px
 
 # read data from SIPSA
 wsdl = 'http://appweb.dane.gov.co:9001/sipsaWS/SrvSipsaUpraBeanService?WSDL'
