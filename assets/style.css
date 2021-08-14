@@ -76,6 +76,5 @@ which works well instead. */
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-
 /* To add marging to the rows in bdc*/
 .row-with-margin { margin-bottom:2%; }
