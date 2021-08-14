@@ -13,7 +13,6 @@ import numpy as np
 
 # read from github (already processed)
 df_precioProm = pd.read_csv('https://raw.githubusercontent.com/endorgobio/SA_visualiser/master/data/output.csv', index_col=0)
-# TODO: Read from github
 df_promRec = pd.read_csv('https://raw.githubusercontent.com/endorgobio/SA_visualiser/main/data/promRec.csv')
 df_promRec.reset_index(drop=True, inplace=True)
 

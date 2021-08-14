@@ -8,14 +8,14 @@ wsdl = 'http://appweb.dane.gov.co:9001/sipsaWS/SrvSipsaUpraBeanService?WSDL'
 client = zeep.Client(wsdl=wsdl)
 
 # # Get average price per city
-# promAbas = client.service.promediosSipsaCiudad()
-# promAbas = serialize_object(promAbas)
-# df_precioProm = pd.DataFrame(promAbas)
-# # change datatype for date columns
-# df_precioProm['fechaCaptura'] = pd.to_datetime(df_precioProm['fechaCaptura'], utc=True).dt.date
-# df_precioProm['fechaCreacion'] = pd.to_datetime(df_precioProm['fechaCreacion'], utc=True).dt.date
-# # export the file to csv
-# df_precioProm.to_csv("data/output.csv")
+promAbas = client.service.promediosSipsaCiudad()
+promAbas = serialize_object(promAbas)
+df_precioProm = pd.DataFrame(promAbas)
+# change datatype for date columns
+df_precioProm['fechaCaptura'] = pd.to_datetime(df_precioProm['fechaCaptura'], utc=True).dt.date
+df_precioProm['fechaCreacion'] = pd.to_datetime(df_precioProm['fechaCreacion'], utc=True).dt.date
+# export the file to csv
+df_precioProm.to_csv("data/output.csv")
 
 # Get average harvest quantity per Department
 promRec = client.service.promediosSipsaParcial()
@@ -25,8 +25,7 @@ df_promRec['enmaFecha'] = pd.to_datetime(df_promRec['enmaFecha'], utc=True).dt.d
 df_promRec['muniId']=df_promRec['muniId'].astype(int)
 
 # Add city code and geocoding
-# TODO: read from github
-df_cities = pd.read_csv('data/DIVIPOLA_Municipios.csv',  sep=';')
+df_cities = pd.read_csv('https://raw.githubusercontent.com/endorgobio/SA_visualiser/master/data/DIVIPOLA_Municipios.csv',  sep=';')
 df_cities['muniId'] = df_cities['muniId'].astype(int)
 df_promRec = pd.merge(df_promRec, df_cities, on='muniId', how='left')
 df_promRec.to_csv("data/promRec.csv")
