@@ -45,6 +45,20 @@ Mauris sed commodo neque. Aliquam at urna scelerisque ante ornare rutrum. Vestib
 molestie. Phasellus sollicitudin porta massa, blandit suscipit velit aliquet id. Integer efficitur, libero ut 
 consectetur fermentum, est massa feugiat ligula, sed facilisis urna arcu sit amet turpis. Maecenas malesuada 
 neque eu felis eleifend accumsan. Nulla posuere cursus nunc eget dictum.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis et sapien eu purus malesuada rutrum non sed tortor. 
+Phasellus iaculis, ipsum id vulputate euismod, ex purus varius justo, in sollicitudin risus purus sodales diam. 
+Mauris sed commodo neque. Aliquam at urna scelerisque ante ornare rutrum. Vestibulum in dui at arcu fringilla 
+molestie. Phasellus sollicitudin porta massa, blandit suscipit velit aliquet id. Integer efficitur, libero ut 
+consectetur fermentum, est massa feugiat ligula, sed facilisis urna arcu sit amet turpis. Maecenas malesuada 
+neque eu felis eleifend accumsan. Nulla posuere cursus nunc eget dictum.
+''')
+
+reto_text = dcc.Markdown('''
+* ** Reto 1**: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis et sapien eu purus malesuada rutrum non sed tortor. 
+Phasellus iaculis
+* **Reto 2**:  est massa feugiat ligula, sed facilisis urna arcu sit amet turpis. Maecenas malesuada 
+neque eu felis eleifend accumsan. Nulla posuere cur
 ''')
 
 # Final text
@@ -124,14 +138,25 @@ controls_map = html.Div(
     ]
 )
 
+# tab1_content = dbc.Row([
+#     dbc.Card(
+#         dbc.CardBody(
+#             [
+#                 tab1_text
+#             ]
+#         )
+#     )
+#     ]
+# )
 tab1_content = dbc.Row([
-    dbc.Card(
-        dbc.CardBody(
-            [
-                tab1_text
-            ]
-        )
-    )
+        dbc.Col(tab1_text, md=8),
+        dbc.Col(html.Div([
+            html.H4(
+                    children="Los retos", className="header-subtitle"
+                ),
+            reto_text]
+        ),
+            md=4),
     ]
 )
 
@@ -184,6 +209,8 @@ tab3_content = dbc.Row([
     )
     ]
 )
+
+
 
 
 # Define the layout
