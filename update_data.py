@@ -2,6 +2,7 @@ import pandas as pd
 import zeep
 from zeep.helpers import serialize_object
 
+
 # read data from SIPSA
 wsdl = 'http://appweb.dane.gov.co:9001/sipsaWS/SrvSipsaUpraBeanService?WSDL'
 # convert data to dataframe
