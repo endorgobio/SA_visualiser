@@ -4,43 +4,14 @@ body {
     background-color: #F7F7F7;
 }
 
-.header {
-    background-color: #14990f;
-    height: 256px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.header-emoji {
-    font-size: 48px;
-    margin: 0 auto;
-    text-align: center;
-}
-
-.header-title {
-    color: #ffffff;
-    font-size: 48px;
-    font-weight: bold;
-    text-align: center;
-    margin: 0 auto;
-}
-
-.header-subtitle {
-    color: #000000;
-    /*font-size: 48px;
-    font-weight: bold;*/
-    text-align: center;
-    margin: 0 auto;
-}
-
-.header-description {
-    color: #fafaf5;
+.subheader-description {
+    color: #FD6E72;
     margin: 4px auto;
-    text-align: center;
+    text-align: left;
     max-width: 384px;
+    font-size: 24px;
 }
-/*.
+
 .wrapper {
     margin-right: auto;
     margin-left: auto;
@@ -50,39 +21,18 @@ body {
     margin-top: 32px;
 }
 
-card {
+.card {
     margin-bottom: 24px;
     box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.18);
-}*/
-
-/* Set the current outer border to 0 because it's messed up,
-and put the FLATLY properties inside the DateInput_input class
-which works well instead. */
-.SingleDatePickerInput {
-  border: 0px;
 }
 
-/* Fix box width of datepicker to be 100% of parent container*/
-.DateInput, .DateInput_1 {
-  width: 100%; /* replace with whatever length you prefer */
-}
 
-/* Fix the font size and other stuff of datepicker*/
-.DateInput_input, .DateInput_input_1 {
-  /* my personal stuff */
-  text-align: center;
-  line-height: calc(1.5em + 0.75rem);
-  /* default flatly stuff */
-  height: calc(1.5em + 0.75rem + 2px);
-  font-size: 0.9375rem;
-  font-weight: 400;
-  color: #7b8a8b;
-  background-color: #fff;
-  background-clip: padding-box;
-  border: 1px solid #ced4da;
-  border-radius: 0.25rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+*[data-dash-is-loading="true"]{
+    visibility: hidden;
 }
-
-/* To add marging to the rows in bdc*/
-.row-with-margin { margin-bottom:2%; }
+*[data-dash-is-loading="true"]::before{
+    content: "Loading...";
+    display: inline-block;
+    color: blue;
+    visibility: visible;
+}
