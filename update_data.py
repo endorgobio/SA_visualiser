@@ -26,7 +26,9 @@ df_promRec['enmaFecha'] = pd.to_datetime(df_promRec['enmaFecha'], utc=True).dt.d
 df_promRec['muniId']=df_promRec['muniId'].astype(int)
 
 # Add city code and geocoding
-df_cities = pd.read_csv('https://raw.githubusercontent.com/endorgobio/SA_visualiser/master/data/DIVIPOLA_Municipios.csv',  sep=';')
+df_cities = pd.read_csv('https://raw.githubusercontent.com/endorgobio/SA_visualiser/master/data/DIVIPOLA_Municipios.csv',
+                        sep=';',
+                        encoding='unicode_escape')
 df_cities['muniId'] = df_cities['muniId'].astype(int)
 df_promRec = pd.merge(df_promRec, df_cities, on='muniId', how='left')
 df_promRec.to_csv("data/promRec.csv")
